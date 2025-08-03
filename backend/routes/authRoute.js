@@ -12,4 +12,5 @@ router.post("/verify-otp", authController.verifyOtp);
 router.put("/update-profile", authMiddleware, multerMiddleware, authController.updateProfile);
 router.get("/logout",authController.logout);
 router.get("/check-auth",authMiddleware,authController.checkAuthenticate);
+router.get("/users",authMiddleware,authController.getAllUsers)
 module.exports = router;
