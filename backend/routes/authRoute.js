@@ -1,8 +1,15 @@
-const express=require("express");
-const authcontroller=require("../controllers/authController");
-const router=express.Router();
+const express = require("express");
+const authController = require("../controllers/authController");
+const { multerMiddleware } = require("../config/cloudinaryConfig");
+const authMiddleware = require("../middleware/authMiddleware");
 
-router.post("/send-otp",authcontroller.sendOtp);
-router.post("/verify-otp",authcontroller.verifyOtp);
+const router = express.Router();
 
-module.exports=router;
+router.post("/send-otp", authController.sendOtp);
+router.post("/verify-otp", authController.verifyOtp);
+
+// Protected route
+router.put("/update-profile", authMiddleware, multerMiddleware, authController.updateProfile);
+router.get("/logout",authController.logout);
+router.get("/check-auth",authMiddleware,authController.checkAuthenticate);
+module.exports = router;
