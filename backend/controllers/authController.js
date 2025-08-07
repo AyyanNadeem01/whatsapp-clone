@@ -5,6 +5,7 @@ const response = require("../utils/responseHandler");
 const twilioService =require("../services/twilioService");
 const generateToken = require("../utils/generateToken");
 const { uploadFileToCloudinary } = require("../config/cloudinaryConfig");
+const Message = require("../models/Message");
 const Conversation = require("../models/Conversation");
 //Step 1: Send Otp
 const sendOtp=async(req,res)=>{

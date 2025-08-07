@@ -1,7 +1,6 @@
 const response = require("../utils/responseHandler");
 const { uploadFileToCloudinary } = require("../config/cloudinaryConfig");
 const Status = require("../models/Status");
-const { MongoCryptCreateDataKeyError } = require("mongodb");
 
 exports.createStatus = async (req, res) => {
     try {
