@@ -132,8 +132,6 @@ const initializeSocket = (server) => {
                 conversationId,
                 isTyping: false
             })
-
-
         })
 
         //add or update reactions on message
