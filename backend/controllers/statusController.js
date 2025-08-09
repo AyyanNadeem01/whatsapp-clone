@@ -105,7 +105,6 @@ exports.viewStatus = async (req, res) => {
             .populate("viewers", "username profilePicture");
 
             //emit socket event
-            //emit socket event
             if(req.io && req.socketUserMap){
                 const statusOwnerSocketId=req.socketUserMap.get(status.user._id.toString())
                 if(statusOwnerSocketId){
