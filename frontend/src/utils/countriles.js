@@ -1,4 +1,4 @@
-const countries = [
+const countries = [ { dialCode: "+92", flag: "🇵🇰", alpha2: "PK", name: "Pakistan" },
     { dialCode: "+91", flag: "🇮🇳", alpha2: "IN", name: "India" },
     { dialCode: "+7", flag: "🇷🇺", alpha2: "RU", name: "Russia" },
     { dialCode: "+7", flag: "🇰🇿", alpha2: "KZ", name: "Kazakhstan" },
@@ -14,7 +14,7 @@ const countries = [
     { dialCode: "+880", flag: "🇧🇩", alpha2: "BD", name: "Bangladesh" },
     { dialCode: "+886", flag: "🇹🇼", alpha2: "TW", name: "Taiwan" },
     { dialCode: "+90", flag: "🇹🇷", alpha2: "TR", name: "Turkey" },
-    { dialCode: "+92", flag: "🇵🇰", alpha2: "PK", name: "Pakistan" },
+   
     { dialCode: "+93", flag: "🇦🇫", alpha2: "AF", name: "Afghanistan" },
     { dialCode: "+94", flag: "🇱🇰", alpha2: "LK", name: "Sri Lanka" },
     { dialCode: "+95", flag: "🇲🇲", alpha2: "MM", name: "Myanmar" },
