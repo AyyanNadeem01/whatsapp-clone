@@ -5,10 +5,14 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
 import useUserStore from "../../store/useUserStore";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import useThemeStore from "../../store/themeStore";
 import { motion } from "framer-motion";
-import { FaChevronDown, FaWhatsapp } from "react-icons/fa";
+import { FaUser, FaChevronDown, FaWhatsapp } from "react-icons/fa";
+import Spinner from "../../utils/Spinner"; // or the correct path
+import { sendOtp, updateUserProfile, verifyOtp } from "../../services/user.service";
+import { toast } from "react-toastify";
+
 //validate schema
 const loginValidationSchema = yup
   .object()
@@ -71,6 +75,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const [showDropDown, setShowDropDown] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading]=useState(false)
   const navigate = useNavigate();
   const { setUser } = useUserStore();
 
@@ -105,6 +110,114 @@ const Login = () => {
       country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       country.dialCode.includes(searchTerm)
   );
+
+    const onLoginSubmit=async()=>{
+      try{
+        setLoading(true);
+        if(email){
+          const response=await sendOtp(null,null,email);
+          if(response.status==="success"){
+              toast.info("OTP is send to your email");
+              setUserPhoneData(email);
+              setStep(2);
+          }
+        }
+        else{
+          const response =await sendOtp(phoneNumber,selectedCountry.dialCode);
+          if(response.status==="success"){
+              toast.info("OTP is send to your Phone Number");
+              setUserPhoneData({phoneNumber,phoneSuffix:selectedCountry.dialCode});
+              setStep(2);
+          }
+        }
+      }catch(error){
+          console.log(error);
+          setError(error.message || "Failed to send OTP");
+      }finally{
+        setLoading(false)
+      }
+    }
+
+    const onOtpSubmit=async ()=>{
+      try{
+          setLoading(true);
+          if(!userPhoneData){
+            throw new Error("Phone or email data is missing");
+          }
+          const otpString=otp.join("");
+          let response;
+          if(userPhoneData?.email){
+              response=await verifyOtp(null,null,otpString,userPhoneData.email)
+          }else{
+            response=await verifyOtp(userPhoneData.phoneNumber,userPhoneData.phoneSuffix,otpString)
+            if(response.status==="success"){
+              toast.success("Otp Verified Sucessfully")
+              const user=response.data?.user;
+              if(user.username && user?.profilePicture){
+                setUser(user);
+                toast.success("Welcome Back to WhatsApp")
+                navigate("/")
+                resetLoginState();
+              }else{
+                  setStep(3);
+              }
+            }
+          }
+      }catch(error){
+       console.log(error);
+          setError(error.message || "Failed to verify OTP");
+      }finally{
+        setLoading(false)
+      }
+    }
+
+  const handleChange=(e)=>{
+    const file=e.target.files[0];
+    if(file){
+      setProfilePicture(file);
+      setProfilePicture(URL.createObjectURL(file))
+    }
+  }
+
+  const onProfileSubmit=async(data)=>{
+    try{
+      setLoading(true)
+      const formData=new FormData();
+      formData.append("username",data.username)
+      formData.append("agreed",data.agreed)
+      if(profilePicture){
+        formData.append("media",profilePicture)
+      }else{
+        formData.append("profilePicture",selectedAvatar)
+      }
+    await updateUserProfile(formData)
+    toast.success("Welcome back to Whatsapp")
+    navigate("/")
+    resetLoginState()
+    }catch(error){
+       console.log(error);
+          setError(error.message || "Failed to update user profile");
+      }finally{
+        setLoading(false)
+      }
+  }
+  
+  const handleOtpChange=(index,value)=>{
+    const newOtp=[...otp]
+    newOtp[index]=value;
+    setOtp(newOtp)
+    setOtpValue("otp",newOtp.join(""))
+    if(value && index>5){
+      document.getElementById(`otp-${index+1}`).focus()
+    }  
+  }
+
+  const handleBack=()=>{
+    setStep(1)
+    setUserPhoneData(null)
+    setOtp(["","","","","",""])
+    setError("")
+  }
 
   const ProgressBar = () => (
     <div
@@ -149,7 +262,7 @@ const Login = () => {
           <FaWhatsapp className="w-16 h-16 text-white" />
         </motion.div>
         <h1
-          classname={`text-3xl font-bold text-center mb-6 ${
+          className={`text-3xl font-bold text-center mb-6 ${
             theme === "dark" ? "text-white" : "gray-800"
           }`}
         >
@@ -206,7 +319,7 @@ const Login = () => {
                               : "bg-white bg-gray-300"
                           } rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500`}
                           type="text"
-                          onchange={(e) => setSearchTerm(e.target.value)}
+                          onChange={(e) => setSearchTerm(e.target.value)}
                           value={searchTerm}
                           placeholder="Search Countries ..."
                         />
@@ -243,14 +356,60 @@ const Login = () => {
                     theme === "dark"
                       ? "bg-gray-700 border-gray-600 text-white"
                       : "bg-white border-gray-300"
-                  } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${loginErrors.phoneNumber ? "border-red-500":""}`}
+                  } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                    loginErrors.phoneNumber ? "border-red-500" : ""
+                  }`}
                 />
-
               </div>
               {loginErrors.phoneNumber && (
-                <p className="text-red-500 text-sm">{loginErrors.phoneNumber.message}</p>
+                <p className="text-red-500 text-sm">
+                  {loginErrors.phoneNumber.message}
+                </p>
               )}
             </div>
+            {/* divider with or */}
+            <div className="flex items-center my-4">
+              <div className="flex-grow h-px bg-gray-300"></div>
+              <span className="mx-3 text-gray-500 text-sm font-medium">Or</span>
+              <div className="flex-grow h-px bg-gray-300"></div>
+            </div>
+
+            {/* email input div */}
+            <div
+              className={`flex items-center border rounded-md px-3 py-2 ${
+                theme === "dark"
+                  ? "bg-gray-700 border-gray-600"
+                  : "bg-white border-gray-300"
+              }`}
+            >
+              <FaUser className={`mx-2 text-gray-400 ${theme==="dark"?"text-gray-600":"text-gray-500"}`} />
+              <input
+                  type="email"
+                  {...loginRegister("email")}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email optional"
+                  className={`w-full bg-transparent focus:outline-none ${
+                    theme === "dark"
+                      ? " text-white"
+                      : "text-black bg-white border-gray-300"
+                  } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                    loginErrors.email ? "border-red-500" : ""
+                  }`}
+                />    
+                              {loginErrors.email && (
+                <p className="text-red-500 text-sm">
+                  {loginErrors.email.message}
+                </p>
+              )}
+         
+            </div>
+              <button type="submit"
+              className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-500 transition"
+              >
+                {loading?<Spinner/>:"Send OTP"}
+              </button>
+
           </form>
         )}
       </motion.div>
