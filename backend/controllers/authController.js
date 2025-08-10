@@ -9,6 +9,8 @@ const Message = require("../models/Message");
 const Conversation = require("../models/Conversation");
 //Step 1: Send Otp
 const sendOtp=async(req,res)=>{
+     console.log("Request received for sendOtp from front end!");
+    console.log("Request body:", req.body);
     const {phoneNumber,phoneSuffix,email}=req.body;
     const otp= otpGenerator();
     const expiry=new Date(Date.now()+5*60*1000);
@@ -56,7 +58,7 @@ const verifyOtp=async (req,res)=>{
                 return response(res,404,"User Not found")
             }
             const now=new Date();
-            if(!user.emailOtp || user.emailOtp !== otp || now > new Date(user.emailOtpExpiry)){
+            if(!user.emailOtp || user.emailOtp != otp || now > new Date(user.emailOtpExpiry)){
                 return response(res,400,"Invalid or expired otp")
             }
             user.isVerified=true;
@@ -84,7 +86,7 @@ const verifyOtp=async (req,res)=>{
             httpOnly:true,
             maxAge:1000*60*60*24*365
         });
-        return response(res,200,"otp verified successfully")
+        return response(res,200,"otp verified successfully",{user})
     }catch(error){
         console.error(error);
         return response(res,500,"Internal server error");
