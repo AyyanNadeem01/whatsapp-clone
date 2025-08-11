@@ -110,7 +110,7 @@ const Login = () => {
   const {
     register: profileRegister,
     handleSubmit: handleProfileSubmit,
-    formState: { errors: profileErrors },
+ watch,    formState: { errors: profileErrors },
   } = useForm({
     resolver: yupResolver(profileValidationSchema),
   });
@@ -516,12 +516,12 @@ const Login = () => {
                   alt="profile"
                   className="w-full h-full rounded-full object-cover"
                 />
-                <label
-                  htmlFor="profile-picture"
-                  className="absolute b-0 right-0 bg-green-500 text-white p-2 rounded-full cursor-pointer hover:bg-green-600 transition duration-300"
-                >
-                  <FaPlus className="w-4 h-4" />
-                </label>
+              <label
+                htmlFor="profile-picture"
+                className="absolute bottom-[-12px] right-[-10px] bg-green-500 text-white p-2 rounded-full cursor-pointer hover:bg-green-600 transition duration-300"
+              >
+                <FaPlus className="w-4 h-4" />
+              </label>
                 <input
                   type="file"
                   id="profile-picture"
@@ -574,6 +574,32 @@ const Login = () => {
                 </p>
               )}
             </div>
+            <div className="flex items-center space-x 2">
+              <input {...profileRegister("agreed")}type="checkbox" 
+              className={`rounded ${theme==="dark"?"text-green-500 bg-green-700":"text-green-500"} focus:ring-green-500`}
+              />
+            <label htmlFor="terms"
+            className={`text-sm ${theme==="dark"?"text-gray-300":"text-gray-700"} `}
+            >
+              I agree to the {" "} 
+              <a  href="#" className="text-red-500 hover:underlined">
+                Terms and Conditions
+              </a>
+            </label>
+              
+            </div>
+              {profileErrors.agreed && (
+                <p className="text-red-500 text-sm mt-1">
+                  {profileErrors.agreed.message}
+                </p>
+              )}
+          <button
+              type="submit" disabled={!watch("agreed")|| loading}
+              className= {`w-full bg-green-500 text-white font-bold py-3 px-3 rounded-md transition duration-300 ease-in-out transform hover:scale-185 flex items-center justify-center text-lg
+              ${loading?"opacity-50 cursor-not-allowed":""}`}        >
+              {loading ? <Spinner /> : "Create Profile"}
+            </button>
+
           </form>
         )}
       </motion.div>
