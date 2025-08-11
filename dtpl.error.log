@@ -1,4 +1,4 @@
-Error: ENOENT: no such file or directory, stat 'd:\projects\whatsapp-clone\frontend\node_modules\.cache\default-development\10.pack_'
+Error: ENOENT: no such file or directory, stat 'd:\projects\whatsapp-clone\frontend\node_modules\.cache\default-development\5.pack_'
     at statSync (node:fs:1741:25)
     at Object.t.statSync (node:electron/js2c/node_init:2:5407)
     at Object.statSync (c:\Users\AT\.vscode\extensions\qiu8310.dot-template-vscode-0.4.0\node_modules\graceful-fs\polyfills.js:308:16)
