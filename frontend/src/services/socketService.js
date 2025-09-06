@@ -4,7 +4,10 @@ import { io } from "socket.io-client";
 const SOCKET_URL = process.env.REACT_APP_API_URL;
 
 // autoConnect: false -> we connect after we know the user id
-const socket = io(SOCKET_URL, { withCredentials: true, autoConnect: false });
+const socket = io(SOCKET_URL, { withCredentials: true,
+  transports:["websocket","pooling"],
+  reconnectionAttempts:5,
+  autoConnect: false });
 
 const connect = (userId) => {
   if (!userId) return;

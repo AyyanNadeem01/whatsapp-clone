@@ -34,7 +34,7 @@ const Layout = ({
       {/* Main content container with a flex-row for desktop */}
       <div className={`flex-1 flex overflow-hidden ${isMobile ? "flex-col" : "flex-row"}`}>
         
-        {/* Chat List container */}
+        {/* Chat List container
         <motion.div
           key="chatList"
           initial={{ x: isMobile ? "-100%" : 0 }}
@@ -45,10 +45,10 @@ const Layout = ({
           className={`${isMobile ? (selectedContact ? 'hidden' : 'w-full pb-16') : 'w-full md:w-2/5'} h-full`}
         >
           {children}
-        </motion.div>
+        </motion.div> */}
 
         {/* Chat Window container */}
-        <motion.div
+        {/* <motion.div
           key="chatwindow"
           initial={{ x: isMobile ? "100%" : 0 }}
           animate={{ x: 0 }}
@@ -62,7 +62,34 @@ const Layout = ({
             setSelectedContact={setSelectedContact}
             isMobile={isMobile}
           />
-        </motion.div>
+        </motion.div> */}
+{/* Chat List container */}
+<motion.div
+  key="chatList"
+  initial={{ x: isMobile ? "-100%" : 0 }}
+  animate={{ x: 0 }}
+  exit={{ x: "-100%" }}
+  transition={{ type: "tween" }}
+  className={`${isMobile ? (selectedContact ? 'hidden' : 'w-full pb-16') : 'w-80 lg:w-96'} h-full`}
+>
+  {children}
+</motion.div>
+
+{/* Chat Window container */}
+<motion.div
+  key="chatwindow"
+  initial={{ x: isMobile ? "100%" : 0 }}
+  animate={{ x: 0 }}
+  exit={{ x: "100%" }}
+  transition={{ type: "tween" }}
+  className={`${isMobile ? (!selectedContact ? 'hidden' : 'w-full') : 'flex-1'} h-full`}
+>
+  <ChatWindow
+    selectedContact={selectedContact}
+    setSelectedContact={setSelectedContact}
+    isMobile={isMobile}
+  />
+</motion.div>
       </div>
 
       {isMobile && <Sidebar />}
