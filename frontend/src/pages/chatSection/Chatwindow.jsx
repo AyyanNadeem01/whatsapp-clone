@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import useThemeStore from "../../store/themeStore";
 import useUserStore from "../../store/useUserStore";
 import { useChatStore } from "../../store/chatStore";
-
+import {isToday,isYesterday,format} from "date-fns";
 const isValidate = (date) => {
   return date instanceof Date && !isNaN(date);
 };
@@ -132,6 +132,58 @@ const Chatwindow = ({ selectedContact, setSelectedContact }) => {
     }catch(error){
       console.error("Failed to send message",error)
     }
+  }
+
+  const renderDateSeparator=(date)=>{
+    if(!isValidate(date)){
+      return null;
+    }
+    let dateString;
+    if(isToday(date)){
+      dateString="Today"
+    }else if(isYesterday(date)){
+      dateString="Yesterday"
+    }else{
+      dateString=format(date,"EEEE MMMM d")
+    }
+
+    return (
+      <div className="flex justify-center my-4">
+        <span className={`px-4 py-2 rounded-full text-sm 
+          ${theme==="dark"?"bg-gray-700 text-gray-300":"bg-gray-200 text-gray-600"}`}>
+              {dateString}
+        </span>
+      </div>
+    )
+  }
+
+
+  //Group message
+  const groupedMessage=Array.isArray(message)?message.reduce((acc,message)=>{
+    if(!message.createdAt) return acc;
+    const date=new Date(message.createdAt);
+    if(isValidate(date)){
+      const dateString=format(date,"yyyy-MM-dd");
+      if(!acc[dateString]){
+        acc[dateString]=[];
+      }
+      acc[dateString].push(message);
+    }else{
+      console.error("Invalid date for message",message)
+    }
+    return acc;
+  },{}):{};
+
+  const handleReaction=(messageId,emoji)=>{
+    addReaction(messageId.emoji)
+  }
+  console.log("this is my contact",selectedContact)
+  if(!selectedContact){
+    return (
+      <div className="">
+        second
+      </div>
+    )
   }
 
   return <div>chat window</div>;

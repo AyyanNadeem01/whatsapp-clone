@@ -453,7 +453,7 @@ export const useChatStore = create((set, get) => ({
     fetchConversations: async () => {
         set({ loading: true, error: null });
         try {
-            const { data } = await axiosInstance.get("/chats/conversations");
+            const { data } = await axiosInstance.get("/chat/conversations");
             set({ conversations: data, loading: false })
 
             get().initsocketListeners();
@@ -474,7 +474,7 @@ export const useChatStore = create((set, get) => ({
         set({ loading: true, error: null })
 
         try {
-            const { data } = await axiosInstance.get(`/chats/conversations/${conversationId}/messages`)
+            const { data } = await axiosInstance.get(`/chat/conversation/${conversationId}/messages`)
             const messageArray = data.data || data || []
             set({
                 messages: messageArray,
@@ -497,6 +497,64 @@ export const useChatStore = create((set, get) => ({
 
     //send message in real time
     sendMessage: async (formData) => {
+    const senderId=formData.get("senderId");
+    const receiverId=formData.get("receiverId");
+    const media =formData.get("media");
+    const content=formData.get("content");
+    const messageStatus=formData.get("messageStatus");
+
+    const socket=getSocket();
+    const {conversations}=get();
+    let conversationId=null;
+    if(conversations?.data?.length>0){
+        const conversation=conversations.data.find((conv)=>
+        conv.participants.some((p)=>p._id ===senderId) &&
+        conv.participants.some((p)=>p._id===receiverId)
+    );
+    if(conversation){
+        conversationId=conversation._id;
+        set({currentConversation:conversationId})
+    }
+    }
+    //temp message before actual response
+    const tempId=`temp-${Date.now()}`;
+    const optimisticMessage={
+        _id:tempId,
+        sender:{_id:senderId},
+        receiver:{_id:receiverId},
+        conversation:conversationId,
+        imageOrVideoUrl:media && typeof media !=="string"?URL.createObjectURL(media):null,
+        content:content,
+        contentType:media?media.type.startsWith("image")?"image":"video":"text",
+        createdAt: new Date().toISOString(),
+        messageStatus,
+    };
+    set((state)=>({
+        messages:[...state.messages,optimisticMessage]
+    }));
+
+    try {
+        const {data}=await axiosInstance.post("/chat/send-message".formData,
+            {headers:{"Content-Type":"multipart/form-data"}}
+        );
+
+        const messageData=data.data||data;
+
+        //replace optimistic message with real one
+        set((state)=>({
+            messages:state.message.map((msg)=>
+            msg._id === tempId ? messageData :msg)
+        }))
+        return messageData;
+    } catch (error) {   
+        console.error("Error sending message",error);
+        set((state)=>({
+            message:state.message.map((msg)=>
+                msg._id===tempId?{...msg,messageStatus:"failed"}:msg),
+            error:error?.response?.data?.message|| error?.message,
+        }))
+        throw error;
+    }
     },
 
     receiveMessage: (message) => {
@@ -551,7 +609,7 @@ export const useChatStore = create((set, get) => ({
         if (unreadIds.length === 0) return;
 
         try {
-            const { data } = await axiosInstance.put("/chats/messages/read", {
+            const { data } = await axiosInstance.put("/chat/messages/read", {
                 messageIds: unreadIds
             });
             console.log("message marks as read", data)
@@ -574,7 +632,7 @@ export const useChatStore = create((set, get) => ({
 
     deleteMessage: async (messageId) => {
         try {
-            await axiosInstance.delete(`/chats/messages/${messageId}`);
+            await axiosInstance.delete(`/chat/messages/${messageId}`);
             set((state) => ({
                 messages: state.messages?.filter((msg) => msg?._id !== messageId)
             }))
