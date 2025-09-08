@@ -68,7 +68,6 @@ const MessageBubble = ({
   currentUser,
   deleteMessage,
 }) => {
-  console.log("this is my message", message);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showReactions, setShowReactions] = useState(false);
   const messageRef = useRef(null);
@@ -108,7 +107,6 @@ const MessageBubble = ({
     if(showOptions) setShowOptions(false)
   })
   if (message === 0) return;
-console.log("🔎 Full message object in MessageBubble:", message);
 
   return (
     <div className={`chat ${bubbleClass}`}>

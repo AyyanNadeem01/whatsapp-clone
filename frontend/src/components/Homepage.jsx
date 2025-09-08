@@ -13,7 +13,6 @@ const Homepage = () => {
             const result = await getAllUsers();
             if (result.status === "success") {
                 setAllUser(result.data);
-                console.log("Fetched contacts:", result.data);
             }
         } catch (error) {
             console.log(error);
@@ -24,7 +23,6 @@ const Homepage = () => {
         getAllUser();
     }, []);
 
-    console.log(allUsers);
 
     return (
         // Pass ChatList as a child to the Layout component
