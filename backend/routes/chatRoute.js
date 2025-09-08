@@ -5,7 +5,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-router.post("/send-message", authMiddleware,chatController.sendMessage);
+router.post("/send-message", authMiddleware,multerMiddleware,chatController.sendMessage);
 router.get("/conversations",authMiddleware,chatController.getConversation);
 router.get("/conversation/:conversationId/messages",authMiddleware,chatController.getMessages);
 

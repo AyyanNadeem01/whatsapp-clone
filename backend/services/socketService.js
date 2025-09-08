@@ -135,7 +135,7 @@ const initializeSocket = (server) => {
         })
 
         //add or update reactions on message
-        socket.on("add_reaction", async ({ messageId, emoji, userId, reactionUserId }) => {
+        socket.on("add_reaction", async ({ messageId, emoji, userId:reactionUserId }) => {
             try {
                 const message = await Message.findById(messageId);
                 if (!message) return;

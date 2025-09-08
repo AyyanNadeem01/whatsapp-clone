@@ -213,22 +213,23 @@ import useUserStore from "../../store/useUserStore";
 import { useChatStore } from "../../store/chatStore";
 import { isToday, isYesterday, format } from "date-fns";
 import whatsappImage from "../../images/whatsapp_image.png";
-import { FaSmile,FaTimes,FaEllipsisV, FaLock ,FaArrowLeft, FaVideo} from "react-icons/fa";
+import {FaFile,FaImage, FaPaperPlane,FaPaperclip,FaSmile,FaTimes,FaEllipsisV, FaLock ,FaArrowLeft, FaVideo} from "react-icons/fa";
 import MessageBubble from "./MessageBubble";
+import EmojiPicker from  "emoji-picker-react"
 const isValidate = (date) => {
   return date instanceof Date && !isNaN(date);
 };
 
 const Chatwindow = ({ selectedContact, setSelectedContact }) => {
   const [message, setMessage] = useState("");
-  const [showEmojiPicker, setEmojiPicker] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showFileMenu, setShowFileMenu] = useState(false);
   const [filePreview, setFilePreview] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const typingTimeOutRef = useRef(null);
   const messageEndRef = useRef(null);
   const emojiPickerRef = useRef(null);
-  const fileInputPicker = useRef(null);
+  const fileInputRef = useRef(null);
 
   const { theme } = useThemeStore();
   const { user } = useUserStore();
@@ -388,7 +389,8 @@ const scrollToBottom = () => {
     : {};
 
   const handleReaction = (messageId, emoji) => {
-    addReaction(messageId.emoji);
+     console.log("✅ Reaction in Chatwindow:", messageId, emoji);
+    addReaction(messageId,emoji);
   };
 
   // console.log("this is my contact", selectedContact);
@@ -456,7 +458,7 @@ const scrollToBottom = () => {
         </button>
       </div>
       </div>
-      <div className={`flex-1 p-4 overflow-y-auto 
+      <div className={`flex-1 p-4 overflow-y-auto space-y-4
         ${theme==="dark"?"bg-[#191a1a]":"bg-[rgb(241,236,229)]"}`}>
           {Object.entries(groupedMessage).map(([date,msgs])=>(
             <React.Fragment key={date}>
@@ -495,12 +497,95 @@ const scrollToBottom = () => {
       )}
 
       <div className={`p-4 ${theme==="dark"?"bg-[#303430]":"bg-white"}
-       flex items-center space-x-2`}>
-        <button>
+       flex items-center space-x-2 relative`}>
+        <button 
+        className="focus:outline-none"
+        onClick={
+          ()=>setShowEmojiPicker(!showEmojiPicker)
+        }
+        >
           <FaSmile
           className={`h-6 w-6 ${theme==="dark"?"text-dark-gray-400":"text-gray-500"}`}
           />
         </button>
+        {showEmojiPicker && (
+          <div ref={emojiPickerRef}
+          className="absolute left-0 bottom-16 z-50">
+  <EmojiPicker
+  onEmojiClick={(emojiObject)=>{
+    setMessage((prev)=>prev+emojiObject.emoji)
+    setShowEmojiPicker(false)
+  }}
+  theme={theme}/>
+          </div>
+        )
+        }
+        <div className="relative">
+          <button className="focus:outline-none"
+          onClick={()=>setShowFileMenu(!showFileMenu)}>
+              <FaPaperclip className={`h-6 w-6 
+                ${theme==="dark"?"text-gray-400":"text-gray-500"} mt-2`}/>
+          </button>
+                {showFileMenu && (
+                  <div className={`absolute bottom-full left-0 mb-2
+                   ${theme==="dark"?"bg-gray-700":"bg-white"}
+                   rounded-lg shadow-lg`}>
+                    <input type="file" 
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept="image/*,video/*"
+                    className="hidden"
+                    />
+                    <button 
+                    onClick={(fileInputRef)}
+                    className={`flex items-center px-4 py-2 w-full transition-colors
+                       hover:bg-gray-100 ${theme==="dark"?"hover:bg-gray-500":"hover:bg-gray-100"}`}
+                    >
+                      <FaImage
+                      className="mr-2"
+                      />Image/Video
+                    </button>
+                    
+
+                                        <button 
+                    onClick={(fileInputRef)}
+                    className={`flex items-center px-4 py-2 w-full transition-colors
+                       hover:bg-gray-100 ${theme==="dark"?"hover:bg-gray-500":"hover:bg-gray-100"}`}
+                    >
+                      <FaFile
+                      className="mr-2"
+                      />Documents
+                    </button>
+                  </div>
+                )
+
+                }
+
+        </div>
+
+        <input type="text" 
+        value={message}
+        onChange={(e)=>setMessage(e.target.value)}
+        onKeyPress={(e)=>{
+          if(e.key==="Enter"){
+            handleSendMessage()
+          }
+        }}
+        placeholder="Type a message"
+        className={`flex-grow px-4 py-2 border rounded-full
+           focus:outline-none focus:ring-2 focus:ring-green-500
+           ${theme==="dark"?"bg-gray-700 text-white border-gray-600":
+            "bg-white text-black border-gray-300"
+           }`}
+        />
+        <button 
+        onClick={handleSendMessage}
+        className="focus:outline-none"
+        >
+          <FaPaperPlane
+          className="h-6 w-6 text-green-500"/>
+        </button>
+
       </div>
     </div>
   );

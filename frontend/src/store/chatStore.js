@@ -495,68 +495,128 @@ export const useChatStore = create((set, get) => ({
         }
     },
 
-    //send message in real time
-    sendMessage: async (formData) => {
-    const senderId=formData.get("senderId");
-    const receiverId=formData.get("receiverId");
-    const media =formData.get("media");
-    const content=formData.get("content");
-    const messageStatus=formData.get("messageStatus");
+    // //send message in real time
+    // sendMessage: async (formData) => {
+    // const senderId=formData.get("senderId");
+    // const receiverId=formData.get("receiverId");
+    // const media =formData.get("media");
+    // const content=formData.get("content");
+    // const messageStatus=formData.get("messageStatus");
 
-    const socket=getSocket();
-    const {conversations}=get();
-    let conversationId=null;
-    if(conversations?.data?.length>0){
-        const conversation=conversations.data.find((conv)=>
-        conv.participants.some((p)=>p._id ===senderId) &&
-        conv.participants.some((p)=>p._id===receiverId)
-    );
-    if(conversation){
-        conversationId=conversation._id;
-        set({currentConversation:conversationId})
-    }
+    // const socket=getSocket();
+    // const {conversations}=get();
+    // let conversationId=null;
+    // if(conversations?.data?.length>0){
+    //     const conversation=conversations.data.find((conv)=>
+    //     conv.participants.some((p)=>p._id ===senderId) &&
+    //     conv.participants.some((p)=>p._id===receiverId)
+    // );
+    // if(conversation){
+    //     conversationId=conversation._id;
+    //     set({currentConversation:conversationId})
+    // }
+    // }
+    // //temp message before actual response
+    // const tempId=`temp-${Date.now()}`;
+    // const optimisticMessage={
+    //     _id:tempId,
+    //     sender:{_id:senderId},
+    //     receiver:{_id:receiverId},
+    //     conversation:conversationId,
+    //     imageOrVideoUrl:media && typeof media !=="string"?URL.createObjectURL(media):null,
+    //     content:content,
+    //     contentType:media?media.type.startsWith("image")?"image":"video":"text",
+    //     createdAt: new Date().toISOString(),
+    //     messageStatus,
+    // };
+    // set((state)=>({
+    //     messages:[...state.messages,optimisticMessage]
+    // }));
+
+    // try {
+    //     const {data}=await axiosInstance.post("/chat/send-message",formData,
+    //         {headers:{"Content-Type":"multipart/form-data"}}
+    //     );
+
+    //     const messageData=data.data||data;
+
+    //     //replace optimistic message with real one
+    //     set((state)=>({
+    //         messages:state.message.map((msg)=>
+    //         msg._id === tempId ? messageData :msg)
+    //     }))
+    //     return messageData;
+    // } catch (error) {   
+    //     console.error("Error sending message",error);
+    //     set((state)=>({
+    //         message:state.message.map((msg)=>
+    //             msg._id===tempId?{...msg,messageStatus:"failed"}:msg),
+    //         error:error?.response?.data?.message|| error?.message,
+    //     }))
+    //     throw error;
+    // }
+    // },
+sendMessage: async (formData) => {
+    const senderId = formData.get("senderId");
+    const receiverId = formData.get("receiverId");
+    const media = formData.get("media");
+    const content = formData.get("content");
+    const messageStatus = formData.get("messageStatus");
+
+    const socket = getSocket();
+    const { conversations } = get();
+    let conversationId = null;
+    if (conversations?.data?.length > 0) {
+        const conversation = conversations.data.find((conv) =>
+            conv.participants.some((p) => p._id === senderId) &&
+            conv.participants.some((p) => p._id === receiverId)
+        );
+        if (conversation) {
+            conversationId = conversation._id;
+            set({ currentConversation: conversationId })
+        }
     }
     //temp message before actual response
-    const tempId=`temp-${Date.now()}`;
-    const optimisticMessage={
-        _id:tempId,
-        sender:{_id:senderId},
-        receiver:{_id:receiverId},
-        conversation:conversationId,
-        imageOrVideoUrl:media && typeof media !=="string"?URL.createObjectURL(media):null,
-        content:content,
-        contentType:media?media.type.startsWith("image")?"image":"video":"text",
+    const tempId = `temp-${Date.now()}`;
+    const optimisticMessage = {
+        _id: tempId,
+        sender: { _id: senderId },
+        receiver: { _id: receiverId },
+        conversation: conversationId,
+        imageOrVideoUrl: media && typeof media !== "string" ? URL.createObjectURL(media) : null,
+        content: content,
+        contentType: media ? media.type.startsWith("image") ? "image" : "video" : "text",
         createdAt: new Date().toISOString(),
         messageStatus,
     };
-    set((state)=>({
-        messages:[...state.messages,optimisticMessage]
+    set((state) => ({
+        messages: [...state.messages, optimisticMessage]
     }));
 
     try {
-        const {data}=await axiosInstance.post("/chat/send-message".formData,
-            {headers:{"Content-Type":"multipart/form-data"}}
+        const { data } = await axiosInstance.post("/chat/send-message", formData,
+            { headers: { "Content-Type": "multipart/form-data" } }
         );
 
-        const messageData=data.data||data;
+        const messageData = data.data || data;
 
-        //replace optimistic message with real one
-        set((state)=>({
-            messages:state.message.map((msg)=>
-            msg._id === tempId ? messageData :msg)
+        // Corrected line
+        set((state) => ({
+            messages: state.messages.map((msg) =>
+                msg._id === tempId ? messageData : msg)
         }))
         return messageData;
-    } catch (error) {   
-        console.error("Error sending message",error);
-        set((state)=>({
-            message:state.message.map((msg)=>
-                msg._id===tempId?{...msg,messageStatus:"failed"}:msg),
-            error:error?.response?.data?.message|| error?.message,
+    } catch (error) {
+        console.error("Error sending message", error);
+        set((state) => ({
+            // Corrected line
+            messages: state.messages.map((msg) =>
+                msg._id === tempId ? { ...msg, messageStatus: "failed" } : msg),
+            error: error?.response?.data?.message || error?.message,
         }))
         throw error;
     }
-    },
-
+},
     receiveMessage: (message) => {
         if (!message) return;
 
@@ -646,6 +706,7 @@ export const useChatStore = create((set, get) => ({
 
     //add/change reactions
     addReaction: async (messageId, emoji) => {
+        console.log("in chat store messageid:",messageId,"emoji:",emoji)
         const socket = getSocket();
         const { currentUser } = get();
         if (socket && currentUser) {
