@@ -1,3 +1,4 @@
+//socket client side front end for chat
 import {io} from "socket.io-client";
 import useUserStore from "../store/useUserStore";
 
