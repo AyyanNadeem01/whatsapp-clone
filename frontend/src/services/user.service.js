@@ -42,7 +42,7 @@ export const checkUserAuth=async()=>{
     }
 }
 
-export const LogoutUser=async()=>{
+export const logoutUser=async()=>{
     try{
         const response=await axiosInstance.get("/auth/logout");
             return response.data;
