@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import useThemeStore from '../../store/themeStore'
 import useUserStore from "../../store/useUserStore"
-import { FaComment,FaQuestionCircle,FaUser,FaSearch, FaMoon, FaSun } from "react-icons/fa";
+import { FaSignInAlt,FaComment,FaQuestionCircle,FaUser,FaSearch, FaMoon, FaSun } from "react-icons/fa";
 import { Link } from "react-router-dom"
 import Layout from "../../components/Layout"
 import { logoutUser } from "../../services/user.service"
@@ -70,7 +70,7 @@ const Setting = () => {
                         [
                           {icon:FaUser,label:"Account",href:"/user-profile"},
                            {icon:FaComment,label:"Chats",href:"/"},
-                            {icon:FaQuestionCircle,label:"Account",href:"/help"}
+                            {icon:FaQuestionCircle,label:"Help",href:"/help"}
                         ].map((item)=>(
                           <Link
                           to={item.href}
@@ -113,6 +113,15 @@ const Setting = () => {
 </button>
 
 </div>
+
+<button onClick={handleLogout}
+className={`w-full flex items-center gap-3
+   p-2 rounded text-red-500 ${theme==="dark"
+      ? "text-white hover:bg-[#202c33]"
+      : "text-black hover:bg-gray-100"} w-full mt-10 md md:mt-36`}>
+  <FaSignInAlt className='h-5 w-5'/>
+  Logout
+</button>
                 </div>
                   </div>
               </div>
