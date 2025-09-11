@@ -1,13 +1,15 @@
 import React, { useState } from 'react'
 import useThemeStore from '../../store/themeStore'
 import useUserStore from "../../store/useUserStore"
-import { FaSearch } from "react-icons/fa";
+import { FaComment,FaQuestionCircle,FaUser,FaSearch, FaMoon, FaSun } from "react-icons/fa";
+import { Link } from "react-router-dom"
 import Layout from "../../components/Layout"
 import { logoutUser } from "../../services/user.service"
 import { toast } from "react-toastify"
 const Setting = () => {
   const [isThemeDialogOpen, setIsDialogOpen] = useState(false)
-  const { theme } = useThemeStore()
+  const { theme, toggleTheme } = useThemeStore()
+
   const { user, clearUser } = useUserStore()
 
   const toggleThemeDialog = () => {
@@ -43,8 +45,6 @@ const Setting = () => {
       :"bg-gray-100 text-black"}
       border-0 pl-10 placeholder-gray-400 rounded p-2`} 
   />
-</div>
-                </div>
                     <div className={`flex items-center gap-4 p-3
                       ${theme==="dark"?"hover:bg-[#202c33]":
                         "hover:bg-gray-100"} rounded-lg cursor-pointer
@@ -61,7 +61,62 @@ const Setting = () => {
                     </p>
                    </div>
                     </div>
+                      
+              {/* menuitems */}
+              <div
+              className='h-[calc(100vh-200px)] overflow-y-auto'>
+                  <div className="space-y-1">
+                    {
+                        [
+                          {icon:FaUser,label:"Account",href:"/user-profile"},
+                           {icon:FaComment,label:"Chats",href:"/"},
+                            {icon:FaQuestionCircle,label:"Account",href:"/help"}
+                        ].map((item)=>(
+                          <Link
+                          to={item.href}
+                          key={item.table}
+                          className={`w-full flex items-center gap-3
+                             p-2 rounded ${theme==="dark"?
+                              "text-white hover:bg-[#202c33]"
+                              :"text-black hover:bg-gray-100"}`}>
+                                <item.icon className='h-5 w-5'/>
+                                <div className={`border-b ${theme==="dark"?
+                                "border-gray-700":"border-gray-200"}
+                                 w-full p-4`}>
+                                  {item.label}
+                                </div>
+                              </Link>
+                        ))
+                    }
+<button
+  onClick={toggleTheme}
+  className={`w-full flex items-center gap-3 p-2 rounded
+    ${theme==="dark"
+      ? "text-white hover:bg-[#202c33]"
+      : "text-black hover:bg-gray-100"}`}
+>
+  {theme==="dark" ? (
+    <FaMoon className='h-5 w-5'/>
+  ) : (
+    <FaSun className="h-5 w-5"/>
+  )}
+  <div
+    className={`flex flex-col text-start border-b 
+      ${theme==="dark" ? "border-gray-700" : "border-gray-200"} 
+      w-full p-2`}
+  >
+    Theme 
+    <span className='ml-auto text-sm text-gray-400'>
+      {theme.charAt(0).toUpperCase() + theme.slice(1)}
+    </span>
+  </div>
+</button>
 
+</div>
+                </div>
+                  </div>
+              </div>
+                
             </div>
 
       </div>
