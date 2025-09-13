@@ -1,58 +1,3 @@
-// import React, { useRef, useState } from "react";
-
-// const MessageBubble = ({
-//   message,
-//   theme,
-//   onReact,
-//   currentUser,
-//   deleteMessage,
-// }) => {
-//   console.log("this is my message", message);
-//   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-//   const [showReactions, setShowReactions] = useState(false);
-//   const messageRef = useRef(null);
-//   const [showOptions, setShowOptions] = useState(false);
-//   const optionRef = useRef(null);
-
-//   const emojiPickrRef = useRef(null);
-//   const reactionsMenuRef = useRef(null);
-//   const isUserMessage = message.sender._id === currentUser?._id;
-
-
-//   const bubbleClass=isUserMessage?`chat-end`:`chat-start`
-
-//   const bubbleContentClass = isUserMessage
-//     ? `chat-bubble md:max-w-[50%]
-//  min-w-[130px] ${theme === "dark" ? "bg-[#144d38] text-white" : "bg-[#d9fdd3] text-black"
-//     }`
-//     : `chat-bubble md:max-w-[50%] min-w-[130px] ${theme === "dark" ? "bg-[#144d38] text-white" : "bg-[#d9fdd3] text-black"
-//     }`;
-
-//   const quickReactions = ["👍", "❤️", "😂", "😮", "😢", "🙏"];
-
-//   const handleReact=(emoji)=>{
-//     onReact(message._id,emoji)
-//     setShowEmojiPicker(false)
-//     setShowReactions(false)
-//   }
-
-//   if(message===0) return;
-
-//   return (
-//   <div className={`chat ${bubbleClass}`}>
-//     <div className={`${bubbleContentClass} relative group`}
-//     ref={messageRef}>
-
-//         <div className="flex justify-center gap-2">
-//             {message.contentType==="text" && <p className="mr-2">{message.content}</p>}
-//         </div>
-//     </div>
-
-
-//   </div>);
-// };
-
-// export default MessageBubble;
 import React, { useRef, useState } from "react";
 import { format } from "date-fns";
 import { FaRegCopy, FaSmile, FaCheck, FaPlus, FaCheckDouble, } from "react-icons/fa";
@@ -122,6 +67,20 @@ const MessageBubble = ({
               </p>
             </div>
           )}
+          {message.contentType === "video" && (
+            <div>
+              <video
+                className="rounded-lg max-w-xs aspect-video"
+                controls
+              >
+                <source src={message.imageOrVideoUrl} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+              {message.content && <p className="mt-1">{message.content}</p>}
+            </div>
+          )}
+
+
 
           <div className="self-end flex items-center justify-end
              gap-1 text-xs opacity-60 mt-2 ml-2">

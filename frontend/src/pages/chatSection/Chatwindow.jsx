@@ -96,7 +96,8 @@ const scrollToBottom = () => {
     if (file) {
       setSelectedFile(file);
       setShowFileMenu(false);
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith("image/")
+      ||file.type.startsWith("video/")) {
         setFilePreview(URL.createObjectURL(file));
       }
     }
@@ -273,9 +274,18 @@ const scrollToBottom = () => {
       </div>
       {filePreview && (
         <div className="relative p-2">
+          {selectedFile?.type.startsWith("video/")?
+          (
+            <video src={filePreview}
+            controls
+            className="w-80 object-cover rounded shadow-lg
+            mx-auto"/>
+          ):(
           <img src={filePreview} 
           className="w-80 object-cover rounded shadow-lg mx-auto"
           alt="file-preview" />
+          ) }
+
           <button onClick={()=>{
             setSelectedFile(null)
             setFilePreview(null)
@@ -328,7 +338,7 @@ const scrollToBottom = () => {
                     className="hidden"
                     />
                     <button 
-                    onClick={(fileInputRef)}
+ onClick={() => fileInputRef.current?.click()} 
                     className={`flex items-center px-4 py-2 w-full transition-colors
                        hover:bg-gray-100 ${theme==="dark"?"hover:bg-gray-500":"hover:bg-gray-100"}`}
                     >
@@ -339,7 +349,7 @@ const scrollToBottom = () => {
                     
 
                                         <button 
-                    onClick={(fileInputRef)}
+                     onClick={() => fileInputRef.current?.click()} 
                     className={`flex items-center px-4 py-2 w-full transition-colors
                        hover:bg-gray-100 ${theme==="dark"?"hover:bg-gray-500":"hover:bg-gray-100"}`}
                     >
