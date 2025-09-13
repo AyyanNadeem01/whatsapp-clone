@@ -1,4 +1,4 @@
-const handleVideoCallEvent=(io,socket,onlineUsers)=>{
+const handleVideoCallEvent=(socket,onlineUsers)=>{
 
     //Initiate video call
     socket.on("initiate_call",

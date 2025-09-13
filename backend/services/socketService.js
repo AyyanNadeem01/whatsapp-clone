@@ -1,6 +1,7 @@
 const { Server } = require("socket.io");
 const User = require("../models/User");
 const Message = require("../models/Message");
+const handleVideoCallEvent = require("./video-call-events");
 
 // Map to store online users => userId: socketID
 const onlineUsers = new Map();
@@ -27,6 +28,7 @@ const initializeSocket = (server) => {
         socket.on("user_connection", async (connectingUserId) => {
             try {
                 userId = connectingUserId;
+                socket.userId=userId;
                 onlineUsers.set(userId, socket.id);
                 socket.join(userId); // join personal room for direct emits
 
@@ -179,6 +181,10 @@ const initializeSocket = (server) => {
                 console.log("error handling reaction", error)
             }
         })
+
+        //handle video call event
+        handleVideoCallEvent(socket,io,onlineUsers)
+
         //handle disconnection and mark user offline
         const handleDisconnected = async () => {
             if (!userId) return;
