@@ -1,8 +1,8 @@
 import {create} from "zustand"
-import {subscibeWithSelector} from "zustand/middleware"
+import { subscribeWithSelector } from "zustand/middleware"
 
 const useVideoCallStore = create(
-    subscibeWithSelector((set,get)=>(
+    subscribeWithSelector((set,get)=>(
         {
             //call store
             currentCall:null,

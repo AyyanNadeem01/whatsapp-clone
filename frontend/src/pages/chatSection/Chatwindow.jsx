@@ -5,8 +5,11 @@ import { useChatStore } from "../../store/chatStore";
 import { isToday, isYesterday, format } from "date-fns";
 import whatsappImage from "../../images/whatsapp_image.png";
 import {FaFile,FaImage, FaPaperPlane,FaPaperclip,FaSmile,FaTimes,FaEllipsisV, FaLock ,FaArrowLeft, FaVideo} from "react-icons/fa";
+import VideoCallManager from "../videoCall/VideoCallManager";
 import MessageBubble from "./MessageBubble";
 import EmojiPicker from  "emoji-picker-react"
+import { getSocket } from "../../services/chat.service";
+import useVideoCallStore from "../../store/videoCallStore";
 const isValidate = (date) => {
   return date instanceof Date && !isNaN(date);
 };
@@ -24,7 +27,7 @@ const Chatwindow = ({ selectedContact, setSelectedContact }) => {
 
   const { theme } = useThemeStore();
   const { user } = useUserStore();
-
+  const {socket}=getSocket()
   const {
     messages,
     loading,
@@ -187,6 +190,22 @@ const scrollToBottom = () => {
 
   // console.log("this is my contact", selectedContact);
   
+  const handleVideoCall=()=>{
+    if(selectedContact && online){
+      const {initiateCall}=useVideoCallStore.getState()
+    
+      const avatar=selectedContact?.profilePicture
+      initiateCall(
+        selectedContact?._id,
+        selectedContact?.username,
+        avatar,
+        "video"
+      )
+    }else{
+      alert("User is offline, cannot initiate the call")
+    }
+  }
+
   if (!selectedContact) {
     return (
       <div
@@ -218,7 +237,7 @@ const scrollToBottom = () => {
 
   // This is the correct return statement for when a contact is selected
   // You need to replace the placeholder `<div>chat window</div>` with your full chat UI.
-  return (
+  return (<>
     <div className="flex-1 h-screen w-full flex flex-col">
       <div className={`p-4 ${theme==="dark"? "bg-[#303430] text-white" : 
         "bg-[rgb(219,228,234)] text-gray-600" 
@@ -242,8 +261,11 @@ const scrollToBottom = () => {
         )}
         </div>
       <div className="flex items-center space-x-4">
-        <button className="focus:outline-none">
-          <FaVideo className="h-5 w-5"/>
+        <button onClick={handleVideoCall}
+        title={online?"Start Video Call":"User is offline"}
+        className="focus:outline-none">
+          <FaVideo className="h-5 w-5 text-green-500
+          hover:text-green-600"/>
         </button>
         <button   className="focus:outline-none">
           <FaEllipsisV className="h-5 w-5"/>
@@ -389,7 +411,8 @@ const scrollToBottom = () => {
 
       </div>
     </div>
-  );
+    <VideoCallManager socket={socket}/>
+  </>);
 };
 
 export default Chatwindow;
