@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef } from 'react'
 import useVideoCallStore from '../../store/videoCallStore'
 import useUserStore from '../../store/useUserStore'
 import useThemeStore from '../../store/themeStore'
-
+import { FaPhoneSlash } from 'react-icons/fa'
 const VideoCallModal = ({socket}) => {
     const localVideoRef=useRef(null)
     const remoteVideoRef=useRef(null)
@@ -228,6 +228,16 @@ const VideoCallModal = ({socket}) => {
         }
     }
 
+    const handleRejectCall=()=>{
+        if(incomingCall){
+            socket.emit("reject_call",{
+                callerId:incomingCall?.callerId,
+                callId:incomingCall?.callId
+            })
+        }
+        endCall()
+    }
+
     const handleEndCall=()=>{
         const participantId=currentCall?.participantId|| incomingCall?.callerId;
         const callId=currentCall?.callId||incomingCall?.callId
@@ -241,9 +251,153 @@ const VideoCallModal = ({socket}) => {
         endCall()
     }
 
+
+    //socket event listeners
+    useEffect(()=>{
+        if(socket) return;
+
+        //call accepted start caller flow
+        const handleCallAccepted=({receiverName})=>{
+            if(currentCall){
+                setTimeout(()=>{
+                    initializCallerCall()
+                },500)
+            }
+        }
+
+        const handleCallRejected=()=>{
+            setCallStatus("rejected")
+            setTimeout(endCall,2000)
+        }
+
+        const handleCallEnded=()=>{
+            endCall()
+        }
+
+        const handleWebRTCOffer=async({offer,senderId,callId})=>{
+            if(!peerConnection) return;
+
+            try {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
+                //process queued ICE candidate
+                await processQueuedCandidates()
+
+
+                //create answer
+                const answer=await peerConnection.createAnswer()
+                await peerConnection.setLocalDescription(answer)
+
+                socket.emit("webrtc_answer",{
+                    answer,
+                    receiverId:senderId,
+                    callId
+                })
+
+                console.log("Receiver: Answer send waiting for ice candidates")
+
+            } catch (error) {
+                console.error("Receiver offer error",error)
+            }
+        }
+
+        //Receiver answer (Caller)
+        const handleWebRTCAnswer=async({answer,senderId,callId})=>{
+                if(!peerConnection) return;
+                if(peerConnection.signalingState==="closed"){
+                    console.log("Caller: Peer connection is closed")
+                    return;
+                }   
+                
+        try {
+            //current caller signing
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(answer))
+            
+            //processQueued the ICE Candidates
+            await processQueuedCandidates()
+
+            const receivers=peerConnection.getReceuvers()
+            console.log("Receivers".receivers)
+
+        } catch (error) {
+            console.error("Caller answer error",error)
+        }
+        }
+
+        //receiver ice candidate
+        const handleWebRTCCandidates=async({candidate,senderId})=>{
+            if(peerConnection && peerConnection.signalingState!=="closed"){
+                if(peerConnection.remoteDescription){
+                    try {
+                        await peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+                        console.log("ICE candidate added")
+                    } catch (error) {
+                        console.log("ICE candidate error",error)
+                    }
+                }else{
+                    console.log("queueing ice candidate")
+                    addIceCandidate(candidate)
+                }
+            }
+        }
+
+        //request all events listeners
+        socket.on("call_accepted",handleCallAccepted)
+        socket.on("call_rejected",handleCallRejected)
+        socket.on("call_ended",handleCallEnded)
+        socket.on("webrtc_offer",handleWebRTCOffer)
+        socket.on("webrtc_answer",handleWebRTCAnswer)
+        socket.on("webrtc_ice_candidate",handleWebRTCCandidates)
+
+        console.log("socket listeners registers")
+        return ()=>{
+        socket.off("call_accepted",handleCallAccepted)
+        socket.off("call_rejected",handleCallRejected)
+        socket.off("call_ended",handleCallEnded)
+        socket.off("webrtc_offer",handleWebRTCOffer)
+        socket.off("webrtc_answer",handleWebRTCAnswer)
+        socket.off("webrtc_ice_candidate",handleWebRTCCandidates)
+        }
+    },[socket,peerConnection,currentCall,incomingCall,user])
+
+    if(!isCallModelOpen && !incomingCall) return null;
+
+    const shouldShowActiveCall=isCallActive||callStatus==="calling"||callStatus==="connecting"
+    
     return (
-    <div>
-      
+    <div className="fixed inset-0 z-50 flex items-center justify-center
+    bg-black bg-opacity-75">
+      <div className={`relative w-full h-full max-w-4xl max-h-3xl rounded-lg
+        overflow-hidden ${theme==="dark"?"bg-gray-900":"bg-white"}`}>
+            {/* incoming call ui */}
+            {incomingCall && !isCallActive && (
+                <div className='flex flex-col items-center justify-center
+                 h-full p-8'>
+                    <div className='text-center mb-8'>
+                        <div className='w-32 h-32 rounded-full
+                         bg-gray-300 mx-auto mb-4 overflow-hidden'>
+                            <img src={displayInfo?.avatar} 
+                            alt={displayInfo?.name} 
+                            className='w-full h-full object-cover'/>
+                        </div>
+                        <h2 
+                        className={`text-2xl font-semibold mb-2 ${theme==="dark"?
+                            "text-white":"text-gray-900"
+                        }`}>
+                            {displayInfo?.name}
+                        </h2>
+                        <p className={`text-lg ${theme==="dark"?"text-gray-300":"text-gray-600"}`}>
+                            Incoming {callType} call...
+                        </p>
+                    </div>
+                    <div className='flex space-x-6'>
+                        <button>
+                            <FaPhoneSlash/>
+                        </button>
+                    </div>
+                </div>
+            )}
+   
+      </div>
     </div>
   )
 }
