@@ -103,7 +103,7 @@ const useStatusStore=create((set,get)=>({
             set({error:error.message})
         }
     },
-
+    //delete status
     deleteStatus:async(statusId)=>{
         try {
             await axiosInstance.delete(`/status/${statusId}`)
