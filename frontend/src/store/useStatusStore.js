@@ -61,6 +61,7 @@ const useStatusStore=create((set,get)=>({
             set({error:error.message,loading:false})
         }
     },
+    //create Status
     createStatus:async(statusData)=>{
         set({loading:true,error:null})
         try {
@@ -91,7 +92,7 @@ const useStatusStore=create((set,get)=>({
             throw error
         }
     },
-
+    //view Status
     viewStatus:async(statusId)=>{
         try {
             await axiosInstance.put(`status/${statusId}/view`)
@@ -103,7 +104,7 @@ const useStatusStore=create((set,get)=>({
             set({error:error.message})
         }
     },
-    //delete status
+    //delete Status
     deleteStatus:async(statusId)=>{
         try {
             await axiosInstance.delete(`/status/${statusId}`)
