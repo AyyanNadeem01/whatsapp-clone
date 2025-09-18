@@ -51,6 +51,7 @@ const useStatusStore=create((set,get)=>({
 
         }
     },
+    //get all statuses
     fetchStatuses:async()=>{
         set({loading:true,error:null})
         try {
