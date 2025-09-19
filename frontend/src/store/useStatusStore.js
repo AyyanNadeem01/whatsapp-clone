@@ -108,6 +108,7 @@ const useStatusStore=create((set,get)=>({
     //delete Status
     deleteStatus:async(statusId)=>{
         try {
+            set({loading:true,error:null})
             await axiosInstance.delete(`/status/${statusId}`)
         set((state)=>({
                 statuses:state.statuses.filter((s)=>s._id!==statusId)
@@ -117,5 +118,62 @@ const useStatusStore=create((set,get)=>({
             set({error:error.message,loading:false})
             throw
         }
-    }
+    },
+    getStatusViewers: async(statusId)=>{
+        try {
+            set({loading:true,error:null})
+            const {data}=await axiosInstance.get(`/status/${statusId}/viewers`)
+            return data.data;
+        } catch (error) {
+            console.error("Error getting status viewrs",error)
+            set({error:error.message,loading:false})
+            throw error
+        }
+    },
+    //helper function for grouped status
+    getGroupedStatus:()=>{
+        const {statuses}=get()
+        return statuses.reduce((acc,status)=>{
+            const statusUserId=status.user?._id
+            if(!acc[statusUserId]){
+                acc[statusUserId]={
+                    id:statusUserId,
+                    name:status?.user?.username,
+                    avatar:status?.user?.profilePicture,
+                    status:[]
+                }
+            }
+            acc[statusUserId].statuses.push({
+                id:status._id,
+                media:status.content,
+                contentType:status.contentType,
+                timestamp:status.createdAt,
+                viewers:status.viewers,
+            })
+            return acc
+        })
+    },
+
+    getUserStatuses:(userId)=>{
+        const groupedStatus=get().getGroupedStatus()
+        return userId?groupedStatus[userId]:null
+    },
+
+    getOtherStatuses:(userId)=>{
+        const groupedStatus=get().getGroupedStatus()
+        return Object.values(groupedStatus).filter(
+            (contact)=>contact._id!==userId)
+    },
+
+    //clear error
+    clearError:()=> set({error:null}),
+
+    reset:()=>
+        set({
+            statuses:[],
+            loading:false,
+            error:null
+        }),
 }))
+
+export default useStatusStore
