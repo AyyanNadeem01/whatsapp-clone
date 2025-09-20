@@ -235,8 +235,6 @@ const scrollToBottom = () => {
     );
   }
 
-  // This is the correct return statement for when a contact is selected
-  // You need to replace the placeholder `<div>chat window</div>` with your full chat UI.
   return (<>
     <div className="flex-1 h-screen w-full flex flex-col">
       <div className={`p-4 ${theme==="dark"? "bg-[#303430] text-white" : 
