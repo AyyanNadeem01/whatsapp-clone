@@ -109,7 +109,7 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from "framer-motion";
 import formatTimestamp from '../../utils/formatTime';
-import {FaTrash} from "framer-motion"
+import {FaTrash} from "react-icons/fa"
 const StatusPreview = ({
   contact,
   currentIndex,
