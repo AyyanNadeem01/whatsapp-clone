@@ -265,8 +265,11 @@ const useStatusStore = create((set, get) => ({
                     statuses: state.statuses.some((s) => s._id === data.data._id)
                         ? state.statuses
                         : [data.data, ...state.statuses],
+                         loading: false
                 }));
-            }
+            }else {
+            set({ loading: false }); // ✅ ensure loading stops even if no data
+        }
 
             return data.data;
         } catch (error) {
