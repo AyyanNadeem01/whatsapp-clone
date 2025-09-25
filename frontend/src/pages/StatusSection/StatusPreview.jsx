@@ -1,3 +1,4 @@
+//src/pages/StatusSection/StatusPreview
 import React, { useState, useEffect } from 'react'
 import { motion } from "framer-motion";
 import formatTimestamp from '../../utils/formatTime';
