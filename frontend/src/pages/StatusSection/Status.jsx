@@ -111,7 +111,7 @@ const Status = () => {
     }
   };
 
-  // ✅ FIXED: Added missing function
+
   const handlePreviewPrev = () => {
     if (currentStatusIndex > 0) {
       setCurrentStatusIndex((prev) => prev - 1);
@@ -141,6 +141,7 @@ const Status = () => {
             onClose={handlePreviewClose}
             onNext={handlePreviewNext}
             onPrev={handlePreviewPrev}
+            onDelete={handleDeleteStatus} 
             theme={theme}
             currentUser={user}
             loading={loading}
