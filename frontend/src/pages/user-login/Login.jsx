@@ -426,10 +426,11 @@ const Login = () => {
             </div>
             <button
               type="submit"
-              className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-500 transition"
+              className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-500 transition"s
             >
               {loading ? <Spinner /> : "Send OTP"}
             </button>
+            <div className="text-center text-red-600 text-sm">Primarily NodeMailer is used in development but due network restrictions of HTTPS, gmail smtp might have blocked, kindly test in development mode or for better solution paid email services like resend or send grid can be used</div>
           </form>
         )}
         {step === 2 && (
