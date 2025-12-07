@@ -9,6 +9,15 @@ const transporter=nodemailer.createTransport({
         pass:process.env.EMAIL_PASS
     }
 });
+(async () => {
+  try {
+    await transporter.verify();
+    console.log("✅ Gmail SMTP connection OK");
+  } catch (err) {
+    console.error("❌ Gmail SMTP blocked or invalid:", err.code, err.message);
+  }
+})();
+
 
 transporter.verify((error,success)=>{
     if(error){
