@@ -430,7 +430,9 @@ const Login = () => {
             >
               {loading ? <Spinner /> : "Send OTP"}
             </button>
-            <div className="text-center text-red-600 text-sm">Primarily NodeMailer is used in development but due network restrictions of HTTPS, gmail smtp might have blocked, kindly test in development mode or for better solution paid email services like resend or send grid can be used</div>
+            <div className="text-center text-red-600 text-sm">Primarily NodeMailer is used in development but due network restrictions of HTTPS, gmail smtp might have blocked, kindly test in development mode or for better solution paid email services like resend or send grid can be used,
+              also for twilio trial account is used which is limited to number 03174259244, for better experience use your own API keys. Thanks
+            </div>
           </form>
         )}
         {step === 2 && (
