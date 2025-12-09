@@ -438,7 +438,14 @@ Please test email functionality in development mode, or consider using a reliabl
 Also, a Twilio trial account is being used, which is limited to sending messages to the number 03174259244.  
 For full functionality, please use your own Twilio API keys.  
 
-For full source code and setup details, <a href="https://github.com/AyyanNadeem01/whatsapp-clone/">Click here...<a/> 
+For full source code and setup details, <a 
+  href="https://github.com/AyyanNadeem01/whatsapp-clone/" 
+  target="_blank" 
+  rel="noopener noreferrer"
+>
+  Click here...
+</a>
+
 
 Thank you for your understanding.
 
