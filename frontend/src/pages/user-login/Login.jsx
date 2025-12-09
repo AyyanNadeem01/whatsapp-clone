@@ -430,8 +430,18 @@ const Login = () => {
             >
               {loading ? <Spinner /> : "Send OTP"}
             </button>
-            <div className="text-center text-red-600 text-sm">Primarily NodeMailer is used in development but due network restrictions of HTTPS, gmail smtp might have blocked, kindly test in development mode or for better solution paid email services like resend or send grid can be used,
-              also for twilio trial account is used which is limited to number 03174259244, for better experience use your own API keys. Thanks
+            <div className="text-center text-red-600 text-sm">⚠️ Notice:  
+Currently, NodeMailer is used for sending emails in development.  
+Due to network restrictions on the hosting platform, Gmail SMTP may be blocked in production, causing email delivery to fail.  
+Please test email functionality in development mode, or consider using a reliable email service like Resend or SendGrid for production.  
+
+Also, a Twilio trial account is being used, which is limited to sending messages to the number 03174259244.  
+For full functionality, please use your own Twilio API keys.  
+
+For full source code and setup details, visit: [WhatsApp Clone GitHub](https://github.com/AyyanNadeem01/whatsapp-clone/)  
+
+Thank you for your understanding.
+
             </div>
           </form>
         )}
